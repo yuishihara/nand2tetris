@@ -1,0 +1,39 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/1/DMux8Way.hdl
+/**
+ * 8-way demultiplexor:
+ * [a, b, c, d, e, f, g, h] = [in, 0,  0,  0,  0,  0,  0,  0] if sel = 000
+ *                            [0, in,  0,  0,  0,  0,  0,  0] if sel = 001
+ *                            [0,  0, in,  0,  0,  0,  0,  0] if sel = 010
+ *                            [0,  0,  0, in,  0,  0,  0,  0] if sel = 011
+ *                            [0,  0,  0,  0, in,  0,  0,  0] if sel = 100
+ *                            [0,  0,  0,  0,  0, in,  0,  0] if sel = 101
+ *                            [0,  0,  0,  0,  0,  0, in,  0] if sel = 110
+ *                            [0,  0,  0,  0,  0,  0,  0, in] if sel = 111
+ */
+CHIP DMux8Way {
+    IN in, sel[3];
+    OUT a, b, c, d, e, f, g, h;
+
+    PARTS:
+    Not(in=sel[0], out=notsel0);
+    Not(in=sel[1], out=notsel1);
+    Not(in=sel[2], out=notsel2);
+    And(a=notsel2, b=notsel1, out=isaorb);
+    And(a=notsel2, b=sel[1],  out=iscord);
+    And(a=sel[2], b=notsel1,  out=iseorf);
+    And(a=sel[2], b=sel[1],   out=isgorh);
+    DMux(in=isaorb, sel=sel[0], a=isa, b=isb);
+    DMux(in=iscord, sel=sel[0], a=isc, b=isd);
+    DMux(in=iseorf, sel=sel[0], a=ise, b=isf);
+    And(a=isgorh, b=notsel0, out=isg);
+    DMux(in=in, sel=isa, a=otherthana, b=a);
+    DMux(in=otherthana, sel=isb, a=otherthanb, b=b);
+    DMux(in=otherthanb, sel=isc, a=otherthanc, b=c);
+    DMux(in=otherthanc, sel=isd, a=otherthand, b=d);
+    DMux(in=otherthand, sel=ise, a=otherthane, b=e);
+    DMux(in=otherthane, sel=isf, a=otherthanf, b=f);
+    DMux(in=otherthanf, sel=isg, a=h, b=g);
+}
